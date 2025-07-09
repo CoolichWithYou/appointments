@@ -1,6 +1,8 @@
-import pytest
 from datetime import datetime
+
+import pytest
 from async_asgi_testclient import TestClient
+
 from server.main import app
 
 
@@ -24,14 +26,14 @@ async def test_appointment_creation_flow():
             "doctor_id": 1,
             "patient_id": 2,
             "start_time": start_time,
-            "end_time": end_time
+            "end_time": end_time,
         }
 
         response = await client.post("/appointments", json=appointment_data)
         assert response.status_code == 200, response.text
         response_data = response.json()
 
-        created_id = response_data['id']
+        created_id = response_data["id"]
 
         assert response_data["doctor_id"] == appointment_data["doctor_id"]
         assert response_data["patient_id"] == appointment_data["patient_id"]

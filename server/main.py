@@ -17,9 +17,7 @@ settings = Settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.pool = await asyncpg.create_pool(
-        dsn=settings.get_db_connection()
-    )
+    app.state.pool = await asyncpg.create_pool(dsn=settings.get_db_connection())
     yield
     await app.state.pool.close()
 

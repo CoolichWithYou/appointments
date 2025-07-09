@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, validator, field_validator
+from pydantic import BaseModel, field_validator, validator
 
 
 class AppointmentModel(BaseModel):
@@ -15,6 +15,7 @@ class AppointmentModel(BaseModel):
             value = value.replace("Z", "+00:00")
         dt = datetime.fromisoformat(value) if isinstance(value, str) else value
         return dt.replace(tzinfo=None)
+
 
 class AppointmentModelOutput(BaseModel):
     id: int
