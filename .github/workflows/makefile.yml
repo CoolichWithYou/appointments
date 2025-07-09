@@ -28,7 +28,7 @@ jobs:
         run: sudo apt-get install docker-compose -y
 
       - name: Start DB
-        run: docker-compose up -d db
+        run: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 
       - name: Wait for PostgreSQL
         run: |
