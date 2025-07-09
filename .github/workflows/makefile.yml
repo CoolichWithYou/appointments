@@ -10,43 +10,35 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_PORT: ${{ secrets.DB_PORT }}
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-
     steps:
-      - name: checkout
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: setup
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: compose install
+      - name: Install Docker Compose
         run: sudo apt-get install docker-compose -y
 
-      - name: up db
-        run: docker-compose up -d db
-
-      - name: waiting for compose to start
+      - name: Create .env from secrets
         run: |
-          echo "Waiting for PostgreSQL..."
-          until docker exec clinic_db pg_isready -U $POSTGRES_USER; do
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env.example
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env.example
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env.example
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env.example
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env.example
+
+      - name: Start services (db + fastapi)
+        run: docker-compose up -d --build
+
+      - name: Wait for FastAPI to be ready
+        run: |
+          echo "Waiting for FastAPI to be ready..."
+          until curl -s http://localhost:8000/docs; do
+            echo "Waiting..."
             sleep 2
           done
+          echo "FastAPI is up!"
 
-      - name: dependencies
-        run: make install
+      - name: Run tests inside FastAPI container
+        run: docker exec clinic_server make test
 
-      - name: linters
-        run: make lint
-
-      - name: Run tests
-        run: make test
+      - name: Run linters inside FastAPI container
+        run: docker exec clinic_server make lint
