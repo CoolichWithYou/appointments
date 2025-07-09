@@ -16,3 +16,6 @@ class Settings(BaseSettings):
             f"postgres://{self.DB_USER}:{self.DB_PASSWORD}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         )
+
+    class Config:
+        env_file = ".env.example"

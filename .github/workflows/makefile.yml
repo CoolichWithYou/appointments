@@ -11,49 +11,37 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_PORT: ${{ secrets.DB_PORT }}
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
       POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: setup
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
-      - name: compose install
+      - name: Install Docker Compose
         run: sudo apt-get install docker-compose -y
 
-      - name: up
-        run: docker-compose up -d --build
+      - name: Start DB
+        run: docker-compose up -d db
 
-      - name: waiting for compose to start
+      - name: Wait for PostgreSQL
         run: |
           echo "Waiting for PostgreSQL..."
           until docker exec clinic_db pg_isready -U $POSTGRES_USER; do
             sleep 2
           done
 
-      - name: Wait for clinic_server to be running
-        run: |
-          while [ "$(docker inspect -f '{{.State.Running}}' clinic_server)" != "true" ]; do
-            echo "Waiting for clinic_server container to be running..."
-            sleep 2
-          done
+      - name: Install dependencies
+        run: make install
 
-      - name: Show FastAPI logs for debugging
-        run: docker logs clinic_server || true
+      - name: Run linters
+        run: make lint
 
-      - name: Run tests inside FastAPI container
-        run: docker exec clinic_server make test
-
-      - name: Run linters inside FastAPI container
-        run: docker exec clinic_server make lint
+      - name: Run tests
+        run: make test
