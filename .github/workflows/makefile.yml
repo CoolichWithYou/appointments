@@ -32,7 +32,7 @@ jobs:
       - name: compose install
         run: sudo apt-get install docker-compose -y
 
-      - name: up db
+      - name: up
         run: docker-compose up -d --build
 
       - name: waiting for compose to start
@@ -41,6 +41,17 @@ jobs:
           until docker exec clinic_db pg_isready -U $POSTGRES_USER; do
             sleep 2
           done
+
+
+      - name: Wait for clinic_server to be running
+        run: |
+          while [ "$(docker inspect -f '{{.State.Running}}' clinic_server)" != "true" ]; do
+            echo "Waiting for clinic_server container to be running..."
+            sleep 2
+          done
+
+      - name: Show FastAPI logs for debugging
+        run: docker logs clinic_server || true
 
       - name: Run tests inside FastAPI container
         run: docker exec clinic_server make test
