@@ -37,8 +37,7 @@ jobs:
             sleep 2
           done
 
-      - name: logs
-        if: failure()
+      - name: Show FastAPI container logs
         run: docker logs clinic_server || true
 
 
