@@ -5,11 +5,11 @@ from server.utility import singleton
 
 @singleton
 class Settings(BaseSettings):
-    DB_HOST: str = "localhost"
-    DB_PORT: str = "5432"
-    DB_NAME: str = "dbname"
-    DB_USER: str = "username"
-    DB_PASSWORD: str = "password"
+    DB_HOST: str
+    DB_PORT: str
+    DB_NAME: str
+    DB_USER: str
+    DB_PASSWORD: str
 
     def get_connection(self):
         return (
