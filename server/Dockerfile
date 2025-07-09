@@ -23,3 +23,5 @@ HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
 USER app
 
 WORKDIR /
+
+CMD ["/wait-for-db.sh", "uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "8000"]
