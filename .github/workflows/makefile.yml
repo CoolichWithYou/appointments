@@ -42,7 +42,6 @@ jobs:
             sleep 2
           done
 
-
       - name: Wait for clinic_server to be running
         run: |
           while [ "$(docker inspect -f '{{.State.Running}}' clinic_server)" != "true" ]; do
