@@ -9,8 +9,8 @@ RUN apt-get update && \
 
 RUN useradd --create-home --shell /bin/bash app
 
-WORKDIR /app
-COPY . /app
+WORKDIR /server
+COPY . /server
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends libpq-dev gcc && \
@@ -22,4 +22,6 @@ USER app
 
 HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+WORKDIR /
+
+CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "8000"]
