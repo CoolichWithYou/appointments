@@ -14,7 +14,7 @@ lint:
 
 test:
 	@echo "Running tests with pytest..."
-	pytest
+	pytest --cache-clear
 
 install:
 	pip install -r requirements.txt
