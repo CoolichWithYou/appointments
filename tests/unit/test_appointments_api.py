@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 from fastapi import HTTPException
 
-from server.main import get_appointments
+from server.main import getapp
 from server.schema import AppointmentModel
 
 
@@ -22,7 +22,7 @@ async def test_appointment_time_conflict(mocker):
     )
 
     with pytest.raises(HTTPException) as exc_info:
-        await get_appointments(appointment, mock_conn)
+        await getapp(appointment, mock_conn)
 
     assert exc_info.value.status_code == 409
 
