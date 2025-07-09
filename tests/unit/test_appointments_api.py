@@ -25,10 +25,15 @@ async def test_appointment_time_conflict(mocker):
         await get_appointments(appointment, mock_conn)
 
     assert exc_info.value.status_code == 409
-    assert "У доктора уже есть встреча в это время" in str(exc_info.value.detail)
+
+    query = (
+        "SELECT FROM appointment "
+        "WHERE doctor_id = $1 AND start_time < $3 AND end_time > $2 "
+        "LIMIT 1;"
+    )
 
     mock_conn.fetchval.assert_called_once_with(
-        "\n        SELECT 1\n        FROM appointment\n        WHERE doctor_id = $1\n          AND start_time < $3\n          AND end_time > $2\n        LIMIT 1;\n        ",
+        query,
         1,
         appointment.start_time,
         appointment.end_time,

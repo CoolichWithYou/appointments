@@ -1,6 +1,4 @@
-import sys
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 import asyncpg
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -8,16 +6,12 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from server.schema import AppointmentModel, AppointmentModelOutput
 from server.settings import Settings
 
-# TODO: psycopg to asyncpg
-
-# sys.path.append(str(Path(__file__)))
-
 settings = Settings()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.pool = await asyncpg.create_pool(dsn=settings.get_db_connection())
+    app.state.pool = await asyncpg.create_pool(dsn=settings.get_connection())
     yield
     await app.state.pool.close()
 
@@ -36,7 +30,7 @@ def health():
 
 
 @app.post("/appointments", response_model=AppointmentModelOutput)
-async def get_appointments(appointment: AppointmentModel, conn=Depends(get_connection)):
+async def postapp(appointment: AppointmentModel, conn=Depends(get_connection)):
     start = appointment.start_time
     end = appointment.end_time
 
@@ -82,7 +76,7 @@ async def get_appointments(appointment: AppointmentModel, conn=Depends(get_conne
 
 
 @app.get("/appointments/{meet_id}", response_model=AppointmentModelOutput)
-async def say_hello(meet_id: int, conn=Depends(get_connection)):
+async def getapp(meet_id: int, conn=Depends(get_connection)):
     row = await conn.fetchrow(
         """
         SELECT *
@@ -93,7 +87,10 @@ async def say_hello(meet_id: int, conn=Depends(get_connection)):
     )
 
     if not row:
-        raise HTTPException(status_code=404, detail="Указанной встречи не найдено")
+        raise HTTPException(
+            status_code=404,
+            detail="Указанной встречи не найдено",
+        )
 
     appointment_dict = {
         "id": row[0],

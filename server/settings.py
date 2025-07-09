@@ -11,5 +11,8 @@ class Settings(BaseSettings):
     DB_USER: str = "username"
     DB_PASSWORD: str = "password"
 
-    def get_db_connection(self):
-        return f"""postgres://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"""
+    def get_connection(self):
+        return (
+            f"postgres://{self.DB_USER}:{self.DB_PASSWORD}"
+            f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        )

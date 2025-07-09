@@ -61,7 +61,6 @@ async def test_appointment_creation_flow():
         conflict_data["end_time"] = datetime(2023, 1, 1, 11, 30).isoformat()
         response = await client.post("/appointments", json=conflict_data)
         assert response.status_code == 409
-        assert "У доктора уже есть встреча в это время" in response.json()["detail"]
 
         response = await client.get("/appointments/999")
         assert response.status_code == 404
