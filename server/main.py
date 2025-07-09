@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
+
+import asyncpg
+from fastapi import FastAPI, Request, Depends, HTTPException
 # TODO: psycopg to asyncpg
-from psycopg_pool import AsyncConnectionPool
 
 from schema import AppointmentModel
 from settings import Settings
@@ -11,44 +12,75 @@ settings = Settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.async_pool = AsyncConnectionPool(conninfo=settings.get_db_connection())
+    app.state.pool = await asyncpg.create_pool(dsn=settings.get_db_connection())
     yield
-    await app.async_pool.close()
+    await app.state.pool.close()
+
+
+async def get_connection(request: Request):
+    async with request.app.state.pool.acquire() as conn:
+        yield conn
 
 
 app = FastAPI(lifespan=lifespan)
 
 
-@app.post("/appointments")
-async def get_appointments(request: Request, appointment: AppointmentModel) -> AppointmentModel:
-    async with request.app.async_pool.connection() as conn:
-        async with conn.cursor() as cur:
-            await cur.execute(
-                """
-                INSERT INTO appointment (doctor_id, patient_id, start_time, end_time)
-                    VALUES (%s,%s,%s,%s)
-                    RETURNING id;
-                """, [appointment.doctor_id, appointment.patient_id, appointment.start_time, appointment.end_time])
-            results = await cur.fetchall()
-            return results
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 
-@app.get("/appointments/{meet_id}")
-async def say_hello(request: Request, meet_id: int) -> AppointmentModel | None:
-    async with request.app.async_pool.connection() as conn:
-        async with conn.cursor() as cur:
-            await cur.execute("""
-                SELECT * FROM appointment WHERE id = %s
-            """, [meet_id])
-            result = await cur.fetchone()
-            if result is None:
-                return None
+@app.post("/appointments", response_model=AppointmentModel)
+async def get_appointments(appointment: AppointmentModel, conn=Depends(get_connection)):
+    start = appointment.start_time
+    end = appointment.end_time
 
-            appointment_dict = {
-                "doctor_id": result[1],
-                "patient_id": result[2],
-                "start_time": result[3],
-                "end_time": result[4]
-            }
+    if end <= start:
+        raise HTTPException(status_code=400, detail="Время конца приёма должно быть после времени начала")
 
-            return AppointmentModel(**appointment_dict)
+    # TODO: при несуществующем id возникает except, лучше исправить это через if exists в sql
+    overlap = await conn.fetchval("""
+                                  SELECT 1
+                                  FROM appointment
+                                  WHERE doctor_id = $1
+                                    AND start_time < $3
+                                    AND end_time > $2
+                                  LIMIT 1;
+                                  """, appointment.doctor_id, start, end)
+
+    if overlap:
+        raise HTTPException(
+            status_code=409,
+            detail="У доктора уже есть встреча в это время"
+        )
+
+    row = await conn.fetchrow("""
+                              INSERT INTO appointment (doctor_id, patient_id, start_time, end_time)
+                              VALUES ($1, $2, $3, $4)
+                              RETURNING doctor_id, patient_id, start_time, end_time;
+                              """, appointment.doctor_id, appointment.patient_id, start, end)
+    return AppointmentModel(**row)
+
+
+@app.get("/appointments/{meet_id}", response_model=AppointmentModel | None)
+async def say_hello(meet_id: int, conn=Depends(get_connection)):
+    row = await conn.fetchrow("""
+                              SELECT *
+                              FROM appointment
+                              WHERE id = $1
+                              """, meet_id)
+
+    if not row:
+        raise HTTPException(
+            status_code=404,
+            detail="Указанной встречи не найдено"
+        )
+
+    appointment_dict = {
+        "doctor_id": row[1],
+        "patient_id": row[2],
+        "start_time": row[3],
+        "end_time": row[4]
+    }
+
+    return AppointmentModel(**appointment_dict)
