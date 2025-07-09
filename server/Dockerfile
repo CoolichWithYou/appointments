@@ -6,7 +6,6 @@ RUN apt-get update && \
         libpq-dev \
         gcc \
         postgresql-client \
-        pg_isready \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd --create-home --shell /bin/bash app
