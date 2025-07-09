@@ -1,4 +1,4 @@
-.PHONY: lint test
+.PHONY: lint test install
 
 SRC=server tests
 
@@ -15,3 +15,6 @@ lint:
 test:
 	@echo "Running tests with pytest..."
 	pytest
+
+install:
+	pip install -r server/requirements.txt

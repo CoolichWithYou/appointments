@@ -43,8 +43,7 @@ jobs:
           done
 
       - name: dependencies
-        run: |
-          pip install -r requirements.txt
+        run: make install
 
       - name: linters
         run: make lint
