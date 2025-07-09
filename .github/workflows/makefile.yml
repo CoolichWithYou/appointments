@@ -27,21 +27,18 @@ jobs:
       - name: Install Docker Compose
         run: sudo apt-get install docker-compose -y
 
-      - name: Start DB
+      - name: compose up
         run: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 
-      - name: Wait for PostgreSQL
+      - name: wait db launch
         run: |
           echo "Waiting for PostgreSQL..."
           until docker exec clinic_db pg_isready -U $POSTGRES_USER; do
             sleep 2
           done
 
-      - name: Install dependencies
-        run: make install
+      - name: Run tests inside FastAPI container
+        run: docker exec clinic_server make test
 
-      - name: Run linters
-        run: make lint
-
-      - name: Run tests
-        run: make test
+      - name: Run linters inside FastAPI container
+        run: docker exec clinic_server make lint
