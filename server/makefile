@@ -1,6 +1,6 @@
 .PHONY: lint test install
 
-SRC=server tests
+SRC=. tests
 
 lint:
 	@echo "Running isort..."
@@ -17,4 +17,4 @@ test:
 	pytest
 
 install:
-	pip install -r server/requirements.txt
+	pip install -r requirements.txt
