@@ -10,12 +10,10 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./server/database/init.sql:/docker-entrypoint-initdb.d/init.sql
-    environment:
-      POSTGRES_DB: "dbname"
-      POSTGRES_USER: "username"
-      POSTGRES_PASSWORD: "password"
     networks:
       - app-network
+    env_file:
+      .env.example
   fastapi:
     build: ./server
     container_name: clinic_server
