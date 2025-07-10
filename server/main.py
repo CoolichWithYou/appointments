@@ -2,6 +2,8 @@ from contextlib import asynccontextmanager
 
 import asyncpg
 from fastapi import Depends, FastAPI, HTTPException, Request
+
+from server.db import doctor_appointments
 from server.schema import AppointmentModel, AppointmentModelOutput
 from server.settings import Settings
 
@@ -39,25 +41,11 @@ async def postapp(appointment: AppointmentModel, conn=Depends(get_connection)):
             detail="Время конца приёма должно быть после времени начала",
         )
 
-    # TODO: при несуществующем id возникает except, лучше исправить это через
-    # if exists в sql
-    overlap = await conn.fetchval(
-        """
-        SELECT 1
-        FROM appointment
-        WHERE doctor_id = $1
-          AND start_time < $3
-          AND end_time > $2
-        LIMIT 1;
-        """,
-        appointment.doctor_id,
-        start,
-        end,
-    )
-
+    overlap = await doctor_appointments(conn, appointment)
     if overlap:
         raise HTTPException(
-            status_code=409, detail="У доктора уже есть встреча в это время"
+            status_code=409,
+            detail="У доктора уже есть встреча в это время",
         )
 
     row = await conn.fetchrow(
@@ -71,6 +59,7 @@ async def postapp(appointment: AppointmentModel, conn=Depends(get_connection)):
         start,
         end,
     )
+
     return AppointmentModelOutput(**row)
 
 

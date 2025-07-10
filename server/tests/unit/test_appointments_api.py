@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 from fastapi import HTTPException
+
 from server.main import postapp
 from server.schema import AppointmentModel
 
