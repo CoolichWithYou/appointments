@@ -25,7 +25,7 @@
 принимать подключения.
 
 ### Важно!
-Чтобы проект прошёл все `ci` проверки, надо выставить [секреты репозитория](https://docs.github.com/en/actions/how-tos/security-for-github-actions/security-guides/using-secrets-in-github-actions) в github actions 
+Чтобы проект прошёл все `ci` проверки, надо выставить [секреты репозитория](https://docs.github.com/en/actions/how-tos/security-for-github-actions/security-guides/using-secrets-in-github-actions) в github actions
 
 ## 2. Эндпоинты
 
@@ -46,7 +46,8 @@
 
 Архитектурная схема `/diagrams/architecture.png`  
 ER-диаграмма `/diagrams/er.png`  
-Activity-диаграмма `/diagrams/activity.png`
+Activity-диаграмма `/diagrams/activity.png`  
+[Документ бизнесс-процесса](https://miro.com/welcomeonboard/K2UvTFh4ZFNoYU10SERnbTJQNjJqb01IL1VNaTdLVFBvbmZxNm9rNU5sanRwR1BQeXlBRmI4YkFkNmU0NGVaTjNSeTdTdkpuZkZmNDB1MVllWGw2Yndub2NidW1pNFhoSWR4N3RaQTc0WW1NREQ2cDZLWHMrUW5Yd2VQdFVJY1FnbHpza3F6REdEcmNpNEFOMmJXWXBBPT0hdjE=?share_link_id=575849172273)
 
 ## 5. Проектирование-реализация
 
@@ -64,3 +65,6 @@ Activity-диаграмма `/diagrams/activity.png`
 2. Бот предлагает 2 варианта - выбор врача, либо описать симптомы.
 3. Если выбран первый вариант - бот загружает свободные даты и время приёма с пагинацией в markup
 4. Если пользователь решил описать симптомы, LLM определяет специализацию и запрашивает данные из бд
+
+В качестве ML библиотеки можно использовать переобученную модель BertForSequenceClassification, либо
+gpt-3.5-turbo без тренировки модели

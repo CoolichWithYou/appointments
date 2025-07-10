@@ -3,5 +3,9 @@ FastAPI:7
 Docker/Compose:8
 GitHub Actions:7
 SQL:8
+Код с ИИ:6
+Встраивание решений в бизнес-процессы:8
+
 Английский:да
+
 Трек задач:redmine

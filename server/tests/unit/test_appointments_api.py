@@ -8,7 +8,7 @@ from server.schema import AppointmentModel
 
 
 @pytest.mark.asyncio
-async def test_appointment_time_conflict(mocker):
+async def test_appointment_time_conflict(mocker) -> None:
     mock_conn = mocker.AsyncMock()
     mock_conn.fetchval.side_effect = [1]
 

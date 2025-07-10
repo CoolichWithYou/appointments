@@ -7,7 +7,7 @@ from server.main import app
 
 
 @pytest.mark.asyncio
-async def test_appointment_creation_flow():
+async def test_appointment_creation_flow() -> None:
     """Тестирование полного цикла создания записи через API"""
 
     async with TestClient(app) as client:
