@@ -2,7 +2,6 @@ from contextlib import asynccontextmanager
 
 import asyncpg
 from fastapi import Depends, FastAPI, HTTPException, Request
-
 from server.schema import AppointmentModel, AppointmentModelOutput
 from server.settings import Settings
 

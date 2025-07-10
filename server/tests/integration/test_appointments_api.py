@@ -2,7 +2,6 @@ from datetime import datetime
 
 import pytest
 from async_asgi_testclient import TestClient
-
 from server.main import app
 
 
