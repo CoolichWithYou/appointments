@@ -45,7 +45,7 @@ jobs:
 
 
       - name: Run tests inside FastAPI container
-        run: docker exec clinic_server make -C /app test
+        run: docker exec clinic_server make -C /server test
 
       - name: Run linters inside FastAPI container
-        run: docker exec clinic_server make -C /app lint
+        run: docker exec clinic_server make -C /server lint
