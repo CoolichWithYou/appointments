@@ -11,3 +11,4 @@ pytest-asyncio==1.0.0
 async-asgi-testclient==1.4.11
 pytest-mock==3.14.1
 uvicorn==0.35.0
+httpx==0.28.1
