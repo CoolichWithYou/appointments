@@ -1,25 +1,37 @@
 from datetime import datetime
 
+import asyncpg
 import pytest
-from fastapi import HTTPException
 
-from server.main import postapp
-from server.schema import AppointmentModel
+from server.main import add_doctor, add_patient, postapp
+from server.schema import AppointmentModel, DoctorModel, PatientModel
+from server.settings import Settings
+
+settings = Settings()
+
+connection = None
+
+
+async def get_connection():
+    async with connection.acquire() as conn:
+        yield conn
 
 
 @pytest.mark.asyncio
-async def test_appointment_time_conflict(mocker) -> None:
-    mock_conn = mocker.AsyncMock()
-    mock_conn.fetchval.side_effect = [1]
+async def test_create_appointment() -> None:
+    connection = await asyncpg.create_pool(dsn=settings.get_connection())
 
+    patient = PatientModel(name="dmitry", phone="+9112345678")
+    doctor = DoctorModel(full_name="ivan ivanovich")
+
+    patient = await add_patient(patient, conn=connection)
+    doctor = await add_doctor(doctor, conn=connection)
     appointment = AppointmentModel(
-        doctor_id=1,
-        patient_id=1,
-        start_time=datetime(2023, 1, 1, 10, 0),
-        end_time=datetime(2023, 1, 1, 11, 0),
+        doctor_id=doctor.id,
+        patient_id=patient.id,
+        start_time=datetime(2025, 1, 1, 10, 0),
+        end_time=datetime(2025, 1, 1, 11, 0),
     )
+    appointment = await postapp(appointment, conn=connection)
 
-    with pytest.raises(HTTPException) as exc_info:
-        await postapp(appointment, mock_conn)
-
-    assert exc_info.value.status_code == 409
+    assert appointment.doctor_id == doctor.id

@@ -23,3 +23,32 @@ class AppointmentModelOutput(BaseModel):
     patient_id: int
     start_time: datetime
     end_time: datetime
+
+
+class PatientModel(BaseModel):
+    name: str
+    phone: str
+
+
+class PatientModelOutput(BaseModel):
+    id: int
+    name: str
+    phone: str
+
+
+class DoctorModel(BaseModel):
+    full_name: str
+
+
+class DoctorModelOutput(BaseModel):
+    id: int
+    full_name: str
+
+
+class SpecialityModel(BaseModel):
+    title: str
+
+
+class SpecialityModelOutput(BaseModel):
+    id: int
+    title: str
