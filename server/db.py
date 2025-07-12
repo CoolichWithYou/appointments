@@ -1,7 +1,4 @@
-from server.schema import Appointment
-
 from sqlalchemy import create_engine
-from sqlmodel import SQLModel, Session
 
 from server.settings import Settings
 

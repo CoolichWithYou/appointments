@@ -1,6 +1,7 @@
-from typing import Optional, List
 from datetime import datetime
-from sqlmodel import SQLModel, Field, Relationship
+from typing import List, Optional
+
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class DoctorSpecialityBase(SQLModel):
@@ -13,13 +14,16 @@ class DoctorSpecialityBase(SQLModel):
 class DoctorSpecialityCreate(DoctorSpecialityBase):
     pass
 
+
 class DoctorSpeciality(DoctorSpecialityBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     doctor_id: int = Field(foreign_key="doctor.id", nullable=False)
     speciality_id: int = Field(foreign_key="speciality.id", nullable=False)
 
     doctor: Optional["Doctor"] = Relationship(back_populates="doctor_specialities")
-    speciality: Optional["Speciality"] = Relationship(back_populates="doctor_specialities")
+    speciality: Optional["Speciality"] = Relationship(
+        back_populates="doctor_specialities"
+    )
 
 
 class AppointmentBase(SQLModel):
@@ -55,12 +59,10 @@ class Doctor(DoctorBase, table=True):
     appointments: List[Appointment] = Relationship(back_populates="doctor")
 
     specialities: List["Speciality"] = Relationship(
-        back_populates="doctors",
-        link_model=DoctorSpeciality
+        back_populates="doctors", link_model=DoctorSpeciality
     )
     patients: List["Patient"] = Relationship(
-        back_populates="doctors",
-        link_model=Appointment
+        back_populates="doctors", link_model=Appointment
     )
 
 
@@ -79,8 +81,7 @@ class Patient(PatientBase, table=True):
     appointments: List[Appointment] = Relationship(back_populates="patient")
 
     doctors: List["Doctor"] = Relationship(
-        back_populates="patients",
-        link_model=Appointment
+        back_populates="patients", link_model=Appointment
     )
 
 
@@ -95,9 +96,10 @@ class SpecialityCreate(SpecialityBase):
 class Speciality(SpecialityBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
 
-    doctor_specialities: List[DoctorSpeciality] = Relationship(back_populates="speciality")
+    doctor_specialities: List[DoctorSpeciality] = Relationship(
+        back_populates="speciality"
+    )
 
     doctors: List[Doctor] = Relationship(
-        back_populates="specialities",
-        link_model=DoctorSpeciality
+        back_populates="specialities", link_model=DoctorSpeciality
     )

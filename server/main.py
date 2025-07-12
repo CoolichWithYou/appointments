@@ -1,13 +1,20 @@
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
 
 from server.db import engine
 from server.interaction import doctor_appointments
-from server.schema import Appointment, Patient, Doctor, Speciality, SpecialityCreate, DoctorCreate, PatientCreate, \
-    AppointmentCreate
-
+from server.schema import (
+    Appointment,
+    AppointmentCreate,
+    Doctor,
+    DoctorCreate,
+    Patient,
+    PatientCreate,
+    Speciality,
+    SpecialityCreate,
+)
 from server.settings import Settings
 
 settings = Settings()
@@ -27,7 +34,9 @@ def health():
 
 
 @app.post("/appointment", response_model=Appointment)
-async def postapp(appointment: AppointmentCreate, session: Session = Depends(get_session)):
+async def postapp(
+    appointment: AppointmentCreate, session: Session = Depends(get_session)
+):
     appointment = Appointment.model_validate(appointment)
 
     start = appointment.start_time
@@ -83,7 +92,7 @@ async def add_patient(patient: PatientCreate, session: Session = Depends(get_ses
         insert(Patient)
         .values(name=patient.name, phone=patient.phone)
         .on_conflict_do_nothing(
-            index_elements=['phone'],
+            index_elements=["phone"],
         )
         .returning(Patient.id, Patient.name, Patient.phone)
     )
@@ -110,12 +119,14 @@ async def add_doctor(doctor: DoctorCreate, session: Session = Depends(get_sessio
 
 
 @app.post("/speciality", response_model=Speciality)
-async def add_speciality(spec: SpecialityCreate, session: Session = Depends(get_session)):
+async def add_speciality(
+    spec: SpecialityCreate, session: Session = Depends(get_session)
+):
     stmt = (
         insert(Speciality)
         .values(title=spec.title)
         .on_conflict_do_nothing(
-            index_elements=['title'],
+            index_elements=["title"],
         )
         .returning(Speciality.id, Speciality.title)
     )
