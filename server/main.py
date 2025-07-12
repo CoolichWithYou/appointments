@@ -26,7 +26,7 @@ def health():
     return {"status": "ok"}
 
 
-@app.post("/appointments", response_model=Appointment)
+@app.post("/appointment", response_model=Appointment)
 async def postapp(appointment: AppointmentCreate, session: Session = Depends(get_session)):
     appointment = Appointment.model_validate(appointment)
 
@@ -64,7 +64,7 @@ async def postapp(appointment: AppointmentCreate, session: Session = Depends(get
         raise HTTPException(status_code=400, detail="Ошибка целостности данных")
 
 
-@app.get("/appointments/{meet_id}", response_model=Appointment)
+@app.get("/appointment/{meet_id}", response_model=Appointment)
 async def getapp(meet_id: int, session: Session = Depends(get_session)):
     appointment = session.get(Appointment, meet_id)
 

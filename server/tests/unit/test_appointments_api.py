@@ -1,37 +1,69 @@
 from datetime import datetime
 
-import asyncpg
-import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import StaticPool
+from sqlmodel import Session, SQLModel, create_engine
 
-from server.main import add_doctor, add_patient, postapp
-from server.schema import AppointmentModel, DoctorModel, PatientModel
-from server.settings import Settings
-
-settings = Settings()
-
-connection = None
+from server.main import app, get_session
+from server.schema import PatientCreate
 
 
-async def get_connection():
-    async with connection.acquire() as conn:
-        yield conn
-
-
-@pytest.mark.asyncio
-async def test_create_appointment() -> None:
-    connection = await asyncpg.create_pool(dsn=settings.get_connection())
-
-    patient = PatientModel(name="dmitry", phone="+9112345678")
-    doctor = DoctorModel(full_name="ivan ivanovich")
-
-    patient = await add_patient(patient, conn=connection)
-    doctor = await add_doctor(doctor, conn=connection)
-    appointment = AppointmentModel(
-        doctor_id=doctor.id,
-        patient_id=patient.id,
-        start_time=datetime(2025, 1, 1, 10, 0),
-        end_time=datetime(2025, 1, 1, 11, 0),
+def test_test_intersection():
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
     )
-    appointment = await postapp(appointment, conn=connection)
+    SQLModel.metadata.create_all(engine)
 
-    assert appointment.doctor_id == doctor.id
+    with Session(engine) as session:
+        def get_session_override():
+            return session
+
+        app.dependency_overrides[get_session] = get_session_override
+
+        client = TestClient(app)
+
+        response = client.post(
+            "/patient", json={"name": "Ivan"}
+        )
+
+        data = response.json()
+
+        assert data["name"] == "Ivan"
+        assert response.status_code == 200
+
+        response = client.post(
+            "/doctor", json={"full_name": "Dmitry"}
+        )
+
+        data = response.json()
+
+        assert data["full_name"] == "Dmitry"
+        assert response.status_code == 200
+
+        response = client.post(
+            "/appointment",
+            json={
+                "doctor_id": 1,
+                "patient_id": 1,
+                "start_time": datetime(2025, 1, 1, 10, 0).isoformat(),
+                "end_time": datetime(2025, 1, 1, 11, 0).isoformat(),
+            }
+        )
+
+        assert response.status_code == 200
+
+        response = client.post(
+            "/appointment",
+            json={
+                "doctor_id": 1,
+                "patient_id": 1,
+                "start_time": datetime(2025, 1, 1, 10, 30).isoformat(),
+                "end_time": datetime(2025, 1, 1, 11, 30).isoformat(),
+            }
+        )
+
+        assert response.status_code == 409
+
+        app.dependency_overrides.clear()
