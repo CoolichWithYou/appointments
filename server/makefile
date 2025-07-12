@@ -18,7 +18,7 @@ test:
 
 migrate:
 	@echo "Applying migrations in alembic/versions..."
-	alembic -c /server/alembic.ini upgrade head
+	cd ../ && alembic -c /server/alembic.ini upgrade head
 
 install:
 	pip install -r requirements.txt
