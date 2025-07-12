@@ -7,14 +7,14 @@ create table doctor
 create table speciality
 (
     id         serial primary key,
-    title      varchar(100) not null
+    title      varchar(100) not null unique
 );
 
 create table patient
 (
     id         serial primary key,
     name       varchar(40) not null,
-    phone      varchar(11) unique
+    phone      varchar(11) unique unique
 );
 
 create table doctor_speciality
