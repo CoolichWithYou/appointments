@@ -20,7 +20,9 @@ class DoctorSpeciality(DoctorSpecialityBase, table=True):
     doctor_id: int = Field(foreign_key="doctor.id", nullable=False)
     speciality_id: int = Field(foreign_key="speciality.id", nullable=False)
 
-    doctor: Optional["Doctor"] = Relationship(back_populates="doctor_specialities")
+    doctor: Optional["Doctor"] = Relationship(
+        back_populates="doctor_specialities",
+    )
     speciality: Optional["Speciality"] = Relationship(
         back_populates="doctor_specialities"
     )
@@ -55,7 +57,9 @@ class DoctorCreate(DoctorBase):
 class Doctor(DoctorBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
 
-    doctor_specialities: List[DoctorSpeciality] = Relationship(back_populates="doctor")
+    doctor_specialities: List[DoctorSpeciality] = Relationship(
+        back_populates="doctor",
+    )
     appointments: List[Appointment] = Relationship(back_populates="doctor")
 
     specialities: List["Speciality"] = Relationship(

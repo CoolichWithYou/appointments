@@ -66,15 +66,27 @@ async def postapp(
 
         detail = str(e.orig)
         if "fk_doctor" in detail:
-            raise HTTPException(status_code=404, detail="Доктор не найден")
+            raise HTTPException(
+                status_code=404,
+                detail="Доктор не найден",
+            )
         elif "fk_patient" in detail:
-            raise HTTPException(status_code=404, detail="Пациент не найден")
+            raise HTTPException(
+                status_code=404,
+                detail="Пациент не найден",
+            )
 
-        raise HTTPException(status_code=400, detail="Ошибка целостности данных")
+        raise HTTPException(
+            status_code=400,
+            detail="Ошибка целостности данных",
+        )
 
 
 @app.get("/appointment/{meet_id}", response_model=Appointment)
-async def getapp(meet_id: int, session: Session = Depends(get_session)):
+async def getapp(
+    meet_id: int,
+    session: Session = Depends(get_session),
+):
     appointment = session.get(Appointment, meet_id)
 
     if not appointment:
@@ -87,7 +99,10 @@ async def getapp(meet_id: int, session: Session = Depends(get_session)):
 
 
 @app.post("/patient", response_model=Patient)
-async def add_patient(patient: PatientCreate, session: Session = Depends(get_session)):
+async def add_patient(
+    patient: PatientCreate,
+    session: Session = Depends(get_session),
+):
     stmt = (
         insert(Patient)
         .values(name=patient.name, phone=patient.phone)
@@ -110,7 +125,10 @@ async def add_patient(patient: PatientCreate, session: Session = Depends(get_ses
 
 
 @app.post("/doctor", response_model=Doctor)
-async def add_doctor(doctor: DoctorCreate, session: Session = Depends(get_session)):
+async def add_doctor(
+    doctor: DoctorCreate,
+    session: Session = Depends(get_session),
+):
     db_doctor = Doctor.model_validate(doctor)
     session.add(db_doctor)
     session.commit()
