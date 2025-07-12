@@ -27,4 +27,4 @@ USER app
 
 WORKDIR /
 
-ENTRYPOINT ["/server/entrypoint.sh"]
+CMD ["/wait-for-db.sh", "uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "8000"]
