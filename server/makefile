@@ -22,3 +22,9 @@ migrate:
 
 install:
 	pip install -r requirements.txt
+
+up:
+	sudo docker compose up --build
+
+down:
+	sudo docker compose down

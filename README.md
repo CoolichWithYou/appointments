@@ -11,7 +11,7 @@
 
 ## 1. Описание
 
-Минимальный, но полноценный микросервис для записи пациентов. Для запуска compose сборки локально
+MVP микросервиса для записи пациентов. Для запуска compose сборки локально
 нужно прописать
 
 `docker compose up --build`
@@ -24,22 +24,21 @@
 принимать подключения.
 
 ### Важно!
-Чтобы проект прошёл все `ci` проверки, надо выставить [секреты репозитория](https://docs.github.com/en/actions/how-tos/security-for-github-actions/security-guides/using-secrets-in-github-actions) в github actions
+Чтобы проект прошёл все `ci` проверки, надо следующие [секреты репозитория](https://docs.github.com/en/actions/how-tos/security-for-github-actions/security-guides/using-secrets-in-github-actions) в github actions:
+
+| Секрет/перменная среды | Значение по умолчанию | Краткое описание      |
+|-----------------------:|:----------------------|-----------------------|
+|                DB_HOST | db                    | адрес контейнера с бд |
+|                DB_PORT | 5432                  | порт базы данных      |
+|            POSTGRES_DB | dbname                | название базы данных  |
+|          POSTGRES_USER | username              | пользователь бд       |
+|      POSTGRES_PASSWORD | password              | пароль бд             |
 
 ## 2. Эндпоинты
 
 - `POST /appointments` - создать запись;
 - `GET /appointments/{id}` - получить запись по ID;
 
-## 3. Переменные среды
-
-|  Переменная среды | Значение по умолчанию | Краткое описание      |
-|------------------:|:----------------------|-----------------------|
-|           DB_HOST | db                    | адрес контейнера с бд |
-|           DB_PORT | 5432                  | порт базы данных      |
-|       POSTGRES_DB | dbname                | название базы данных  |
-|     POSTGRES_USER | username              | пользователь бд       |
-| POSTGRES_PASSWORD | password              | пароль бд             |
 
 ## 4. Диаграммы
 
@@ -57,6 +56,7 @@ Activity-диаграмма `/diagrams/activity.png`
 |           Проектирование БД | ER-диаграмма, нормализация схемы               |
 |                  Реализация | compose.yml с сервисами бд и fastapi, makefile |
 | Валидация проектных решений | Написание тестов                               |
+
 
 ## 6. Telegram - bot с ИИ-подбором врача
 
