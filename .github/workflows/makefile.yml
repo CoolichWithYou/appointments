@@ -45,10 +45,10 @@ jobs:
           done
 
       - name: Apply migrations
-        run: docker exec clinic_server make -C /server migrate
+        run: docker exec clinic_server make -C /server prod_migrate
 
       - name: Run tests inside FastAPI container
-        run: docker exec clinic_server make -C /server test
+        run: docker exec clinic_server make -C /server prod_test
 
       - name: Run linters inside FastAPI container
         run: docker exec clinic_server make -C /server lint
