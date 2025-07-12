@@ -16,5 +16,9 @@ test:
 	@echo "Running tests with pytest..."
 	pytest --cache-clear
 
+migrate:
+	@echo "Applying migrations in alembic/versions..."
+	alembic -c /server/alembic.ini upgrade head
+
 install:
 	pip install -r requirements.txt

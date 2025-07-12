@@ -2,20 +2,24 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - develop
+    tags:
+      - 'v'
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     env:
-      POSTGRES_DB:        ${{ secrets.POSTGRES_DB }}
-      POSTGRES_USER:      ${{ secrets.POSTGRES_USER }}
-      POSTGRES_PASSWORD:  ${{ secrets.POSTGRES_PASSWORD }}
-      DB_HOST:            ${{ secrets.DB_HOST }}
-      DB_PORT:            ${{ secrets.DB_PORT }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
 
 
     steps:
@@ -40,9 +44,8 @@ jobs:
             sleep 2
           done
 
-      - name: Show FastAPI container logs
-        run: docker logs clinic_server || true
-
+      - name: Apply migrations
+        run: docker exec clinic_server make -C /server migrate
 
       - name: Run tests inside FastAPI container
         run: docker exec clinic_server make -C /server test
