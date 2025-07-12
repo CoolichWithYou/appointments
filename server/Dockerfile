@@ -16,7 +16,7 @@ COPY . /server
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY entrypoint.sh /wait-for-db.sh
+COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 RUN chown -R app:app /server
