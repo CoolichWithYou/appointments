@@ -61,9 +61,9 @@ MVP микросервиса для записи пациентов. Для за
 
 ## 5. Диаграммы
 
-Архитектурная схема `/diagrams/architecture.png`  
+Activity-диаграмма `/diagrams/activity.pdf`  
+Архитектурная схема `/diagrams/architecture.pdf`  
 ER-диаграмма `/diagrams/er.png`  
-Activity-диаграмма `/diagrams/activity.png`  
 [Документ бизнесс-процесса](https://miro.com/welcomeonboard/K2UvTFh4ZFNoYU10SERnbTJQNjJqb01IL1VNaTdLVFBvbmZxNm9rNU5sanRwR1BQeXlBRmI4YkFkNmU0NGVaTjNSeTdTdkpuZkZmNDB1MVllWGw2Yndub2NidW1pNFhoSWR4N3RaQTc0WW1NREQ2cDZLWHMrUW5Yd2VQdFVJY1FnbHpza3F6REdEcmNpNEFOMmJXWXBBPT0hdjE=?share_link_id=575849172273)
 
 ## 6. Проектирование-реализация
