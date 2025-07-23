@@ -12,7 +12,7 @@ services:
     networks:
       - app-network
     env_file:
-      .env.example
+      .env
   fastapi:
     build: ./server
     container_name: clinic_server
@@ -23,7 +23,7 @@ services:
     networks:
       - app-network
     env_file:
-      .env.example
+      .env
 
 volumes:
   pgdata:

@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.dialects.postgresql import insert
+from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
 
@@ -20,8 +21,8 @@ from server.settings import Settings
 settings = Settings()
 
 
-def get_session():
-    with Session(engine) as session:
+async def get_session() -> AsyncSession:
+    async with AsyncSession(engine) as session:
         yield session
 
 
@@ -35,7 +36,7 @@ def health():
 
 @app.post("/appointment", response_model=Appointment)
 async def postapp(
-    appointment: AppointmentCreate, session: Session = Depends(get_session)
+    appointment: AppointmentCreate, session: AsyncSession = Depends(get_session)
 ):
     appointment = Appointment.model_validate(appointment)
 
@@ -58,11 +59,11 @@ async def postapp(
 
     try:
         session.add(appointment)
-        session.commit()
-        session.refresh(appointment)
+        await session.commit()
+        await session.refresh(appointment)
         return appointment
     except IntegrityError as e:
-        session.rollback()
+        await session.rollback()
 
         detail = str(e.orig)
         if "fk_doctor" in detail:
@@ -85,7 +86,7 @@ async def postapp(
 @app.get("/appointment/{meet_id}", response_model=Appointment)
 async def getapp(
     meet_id: int,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
 ):
     appointment = session.get(Appointment, meet_id)
 
@@ -101,7 +102,7 @@ async def getapp(
 @app.post("/patient", response_model=Patient)
 async def add_patient(
     patient: PatientCreate,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
 ):
     stmt = (
         insert(Patient)
@@ -113,7 +114,7 @@ async def add_patient(
     )
     result = session.exec(stmt)
     created = result.first()
-    session.commit()
+    await session.commit()
 
     if not created:
         raise HTTPException(
@@ -127,18 +128,18 @@ async def add_patient(
 @app.post("/doctor", response_model=Doctor)
 async def add_doctor(
     doctor: DoctorCreate,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
 ):
     db_doctor = Doctor.model_validate(doctor)
     session.add(db_doctor)
-    session.commit()
-    session.refresh(db_doctor)
+    await session.commit()
+    await session.refresh(db_doctor)
     return db_doctor
 
 
 @app.post("/speciality", response_model=Speciality)
 async def add_speciality(
-    spec: SpecialityCreate, session: Session = Depends(get_session)
+    spec: SpecialityCreate, session: AsyncSession = Depends(get_session)
 ):
     stmt = (
         insert(Speciality)
@@ -148,9 +149,9 @@ async def add_speciality(
         )
         .returning(Speciality.id, Speciality.title)
     )
-    result = session.exec(stmt)
+    result = await session.exec(stmt)
     created = result.first()
-    session.commit()
+    await session.commit()
 
     if not created:
         raise HTTPException(
