@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
+from pydantic import field_validator, validator
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -33,6 +34,14 @@ class AppointmentBase(SQLModel):
     patient_id: int = Field(foreign_key="patient.id", nullable=False)
     start_time: datetime
     end_time: datetime
+
+    @field_validator("start_time", "end_time", mode="before")
+    @classmethod
+    def remove_timezone(cls, value):
+        if isinstance(value, str) and value.endswith("Z"):
+            value = value.replace("Z", "+00:00")
+        dt = datetime.fromisoformat(value) if isinstance(value, str) else value
+        return dt.replace(tzinfo=None)
 
 
 class AppointmentCreate(AppointmentBase):
