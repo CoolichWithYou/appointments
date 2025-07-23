@@ -1,8 +1,7 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.dialects.postgresql import insert
-from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import Session
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from server.db import engine
 from server.interaction import doctor_appointments
@@ -36,7 +35,8 @@ def health():
 
 @app.post("/appointment", response_model=Appointment)
 async def postapp(
-    appointment: AppointmentCreate, session: AsyncSession = Depends(get_session)
+    appointment: AppointmentCreate,
+    session: AsyncSession = Depends(get_session),
 ):
     appointment = Appointment.model_validate(appointment)
 

@@ -4,7 +4,10 @@ from sqlmodel import select
 from server.schema import Appointment
 
 
-async def doctor_appointments(session: AsyncSession, appoint: Appointment) -> bool:
+async def doctor_appointments(
+    session: AsyncSession,
+    appoint: Appointment,
+) -> bool:
     statement = (
         select(Appointment)
         .where(Appointment.doctor_id == appoint.doctor_id)

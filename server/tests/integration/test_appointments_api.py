@@ -1,14 +1,15 @@
 from datetime import datetime
 
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
 
 from server.main import app
+
 
 @pytest.mark.asyncio
 async def test_test_intersection():
     async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
+        transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
 
         response = await ac.post("/patient", json={"name": "Ivan"})
