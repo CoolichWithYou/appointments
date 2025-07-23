@@ -112,7 +112,7 @@ async def add_patient(
         )
         .returning(Patient.id, Patient.name, Patient.phone)
     )
-    result = session.exec(stmt)
+    result = await session.exec(stmt)
     created = result.first()
     await session.commit()
 
